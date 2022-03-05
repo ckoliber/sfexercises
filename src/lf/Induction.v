@@ -199,22 +199,68 @@ Proof.
 Theorem mul_0_r : forall n:nat,
   n * 0 = 0.
 Proof.
-  (* FILL IN HERE *) Admitted.
+    intros n.
+    induction n as [| n' Hn'].
+    {
+        simpl.
+        reflexivity.
+    }
+    {
+        simpl.
+        rewrite -> Hn'.
+        reflexivity.
+    }
+Qed.
 
 Theorem plus_n_Sm : forall n m : nat,
   S (n + m) = n + (S m).
 Proof.
-  (* FILL IN HERE *) Admitted.
+    intros n m.
+    induction n as [| n' Hn'].
+    {
+        simpl.
+        reflexivity.
+    }
+    {
+        simpl.
+        rewrite -> Hn'.
+        reflexivity.
+    }
+Qed.
 
 Theorem add_comm : forall n m : nat,
   n + m = m + n.
 Proof.
-  (* FILL IN HERE *) Admitted.
+    intros n m.
+    induction n as [| n' Hn'].
+    {
+        simpl.
+        rewrite -> add_0_r.
+        reflexivity.
+    }
+    {
+        simpl.
+        rewrite <- plus_n_Sm.
+        rewrite <- Hn'.
+        reflexivity.
+    }
+Qed.
 
 Theorem add_assoc : forall n m p : nat,
   n + (m + p) = (n + m) + p.
 Proof.
-  (* FILL IN HERE *) Admitted.
+    intros n m p.
+    induction n as [| n' Hn'].
+    {
+        simpl.
+        reflexivity.
+    }
+    {
+        simpl.
+        rewrite -> Hn'.
+        reflexivity.
+    }
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard (double_plus)
@@ -231,7 +277,19 @@ Fixpoint double (n:nat) :=
 
 Lemma double_plus : forall n, double n = n + n .
 Proof.
-  (* FILL IN HERE *) Admitted.
+    intros n.
+    induction n as [| n' Hn'].
+    {
+        simpl.
+        reflexivity.
+    }
+    {
+        simpl.
+        rewrite -> Hn'.
+        rewrite -> plus_n_Sm.
+        reflexivity.
+    }
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (even_S)
@@ -246,7 +304,19 @@ Proof.
 Theorem even_S : forall n : nat,
   even (S n) = negb (even n).
 Proof.
-  (* FILL IN HERE *) Admitted.
+    intros n.
+    induction n as [| n' Hn'].
+    {
+        simpl.
+        reflexivity.
+    }
+    {
+        rewrite -> Hn'.
+        simpl.
+        rewrite -> negb_involutive.
+        reflexivity.
+    }
+Qed.
 (** [] *)
 
 (** **** Exercise: 1 star, standard, optional (destruct_induction)
@@ -254,7 +324,11 @@ Proof.
     Briefly explain the difference between the tactics [destruct]
     and [induction].
 
-(* FILL IN HERE *)
+(*
+    Destruct: split variable into the possible cases based on definition match'es
+    Induction: split variable into the possible cases based on definition match'es and
+        introduce a base hypothesis
+*)
 *)
 
 (* Do not modify the following line: *)
@@ -452,7 +526,28 @@ Proof.
 
     Theorem: Addition is commutative.
 
-    Proof: (* FILL IN HERE *)
+        n + m = m + n
+
+    Proof: By induction on [n].
+
+    - First: Suppose [n = 0]. We must show that:
+
+        0 + m = m + 0
+
+        This follows directly from the definition of [+].
+
+    - Second: Suppose [n = S n'] where:
+    
+        n' + m = m + n'
+
+        We must show that:
+
+        S n' + m = m + S n'
+
+        By the definition of [+], this follows from:
+
+        S (n' + m) = S (n' + m).
+
 *)
 
 (* Do not modify the following line: *)
@@ -482,16 +577,59 @@ Definition manual_grade_for_add_comm_informal : option (nat*string) := None.
 Theorem add_shuffle3 : forall n m p : nat,
   n + (m + p) = m + (n + p).
 Proof.
-  (* FILL IN HERE *) Admitted.
+    intros n m p.
+    assert (H: m + p = p + m).
+    {
+        rewrite add_comm.
+        reflexivity.
+    }
+    rewrite -> H.
+    rewrite -> add_assoc.
+    rewrite -> add_comm.
+    reflexivity.
+Qed.
 
 (** Now prove commutativity of multiplication.  You will probably
     want to define and prove a "helper" theorem to be used
     in the proof of this one. Hint: what is [n * (1 + k)]? *)
 
+Lemma mul_m_Sn : forall m n : nat,
+    m * (S n) = m * n + m.
+Proof.
+    intros m n.
+    induction m as [| m' Hm'].
+    {
+        simpl.
+        reflexivity.
+    }
+    {
+        simpl.
+        rewrite -> Hm'.
+        rewrite -> plus_n_Sm.
+        rewrite -> plus_n_Sm.
+        rewrite -> add_assoc.
+        reflexivity.
+    }
+Qed.
+
 Theorem mul_comm : forall m n : nat,
   m * n = n * m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+    intros m n.
+    induction n as [| n' Hn'].
+    {
+        simpl.
+        rewrite -> mul_0_r.
+        reflexivity.
+    }
+    {
+        simpl.
+        rewrite -> mul_m_Sn.
+        rewrite -> Hn'.
+        rewrite -> add_comm.
+        reflexivity.
+    }
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, optional (more_exercises)
