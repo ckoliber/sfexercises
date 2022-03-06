@@ -879,8 +879,11 @@ Definition manual_grade_for_binary_commute : option (nat*string) := None.
     (a) First, write a function to convert natural numbers to binary
         numbers. *)
 
-Fixpoint nat_to_bin (n:nat) : bin
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint nat_to_bin (n:nat) : bin :=
+    match n with
+    | O => Z
+    | S n' => incr (nat_to_bin n')
+    end.
 
 (** Prove that, if we start with any [nat], convert it to binary, and
     convert it back, we get the same [nat] we started with.  (Hint: If
@@ -888,9 +891,51 @@ Fixpoint nat_to_bin (n:nat) : bin
     may need to prove a subsidiary lemma showing how such functions
     relate to [nat_to_bin].) *)
 
+Lemma incr_n_is_Sn: forall n:bin,
+    bin_to_nat (incr n) = S (bin_to_nat n).
+Proof.
+    intros n.
+    induction n as [| b0 IHb0| b1 IHb1].
+    - simpl. reflexivity.
+    - simpl. reflexivity.
+    - simpl.
+        rewrite <- plus_n_O.
+        rewrite <- plus_n_O.
+        rewrite -> IHb1.
+        rewrite -> plus_n_Sm.
+        assert (bin_to_nat b1 + S (bin_to_nat b1) = S (bin_to_nat b1) + bin_to_nat b1 ) as H.
+        { rewrite -> add_comm. reflexivity. }
+        rewrite -> H.
+        rewrite -> plus_n_Sm.
+        reflexivity.
+Qed.
+  
+Lemma bin_to_nat_incr_nat_to_bin_is_Sn : forall n: nat,
+    (bin_to_nat (incr (nat_to_bin n))) =  S n.
+Proof.
+    intros n.
+    induction  n as [| n' IHn'].
+    - simpl. reflexivity.
+    - simpl.
+        rewrite <- IHn'.
+        rewrite -> incr_n_is_Sn.
+        rewrite -> incr_n_is_Sn.
+        reflexivity.
+Qed.
+
 Theorem nat_bin_nat : forall n, bin_to_nat (nat_to_bin n) = n.
 Proof.
-  (* FILL IN HERE *) Admitted.
+    induction n as [| n' IHn'].
+    {
+        simpl.
+        reflexivity.
+    }
+    {
+        simpl.
+        rewrite -> bin_to_nat_incr_nat_to_bin_is_Sn.
+        reflexivity.
+    }
+Qed.
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_binary_inverse_a : option (nat*string) := None.
