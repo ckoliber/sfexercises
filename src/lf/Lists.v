@@ -617,11 +617,18 @@ Proof.
     }
     {
         simpl.
-        (* rewrite <- beq_nat_refl. *)
-Abort.
-        (* reflexivity.
+        destruct t as [| h' t'].
+        {
+            simpl.
+            reflexivity.
+        }
+        {
+            simpl.
+            rewrite -> add_comm.
+            reflexivity.
+        }
     }
-  Qed. *)
+Qed.
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_add_inc_count : option (nat*string) := None.
@@ -1019,14 +1026,37 @@ Qed.
 Theorem app_assoc4 : forall l1 l2 l3 l4 : natlist,
   l1 ++ (l2 ++ (l3 ++ l4)) = ((l1 ++ l2) ++ l3) ++ l4.
 Proof.
-  (* FILL IN HERE *) Admitted.
+    intros l1 l2 l3 l4.
+    rewrite -> app_assoc.
+    rewrite -> app_assoc.
+    reflexivity.
+Qed.
 
 (** An exercise about your implementation of [nonzeros]: *)
 
 Lemma nonzeros_app : forall l1 l2 : natlist,
   nonzeros (l1 ++ l2) = (nonzeros l1) ++ (nonzeros l2).
 Proof.
-  (* FILL IN HERE *) Admitted.
+    intros l1 l2.
+    induction l1 as [| h t H].
+    {
+        simpl.
+        reflexivity.
+    }
+    {
+        destruct h as [| h'].
+        {
+            simpl.
+            rewrite -> H.
+            reflexivity.   
+        }
+        {
+            simpl.
+            rewrite -> H.
+            reflexivity.
+        }
+    }
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard (eqblist)
@@ -1035,25 +1065,67 @@ Proof.
     lists of numbers for equality.  Prove that [eqblist l l]
     yields [true] for every list [l]. *)
 
-Fixpoint eqblist (l1 l2 : natlist) : bool
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint eqblist (l1 l2 : natlist) : bool :=
+    match l1, l2 with
+    | nil, nil => true
+    | nil, _ => false
+    | _, nil => false
+    | h1 :: t1, h2 :: t2 =>
+        match h1 =? h2 with
+        | true => eqblist t1 t2
+        | false => false
+        end
+    end.
 
 Example test_eqblist1 :
   (eqblist nil nil = true).
- (* FILL IN HERE *) Admitted.
+Proof.
+    simpl. reflexivity.
+Qed.
 
 Example test_eqblist2 :
   eqblist [1;2;3] [1;2;3] = true.
-(* FILL IN HERE *) Admitted.
+Proof.
+    simpl. reflexivity.
+Qed.
 
 Example test_eqblist3 :
   eqblist [1;2;3] [1;2;4] = false.
- (* FILL IN HERE *) Admitted.
+Proof.
+    simpl. reflexivity.
+Qed.
+
+Lemma eqbnat_refl: forall n: nat,
+    true = (n =? n).
+Proof.
+    induction n as [| n' Hn].
+    {
+        simpl.
+        reflexivity.
+    }
+    {
+        simpl.
+        rewrite -> Hn.
+        reflexivity.    
+    }
+Qed.
 
 Theorem eqblist_refl : forall l:natlist,
   true = eqblist l l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+    intros l.
+    induction l as [| h t H].
+    {
+        simpl.
+        reflexivity.
+    }
+    {
+        simpl.
+        rewrite <- eqbnat_refl.
+        rewrite <- H.
+        reflexivity.
+    }
+Qed.
 (** [] *)
 
 (* ================================================================= *)
@@ -1066,7 +1138,10 @@ Proof.
 Theorem count_member_nonzero : forall (s : bag),
   1 <=? (count 1 (1 :: s)) = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+    intros s.
+    simpl.
+    reflexivity.
+Qed.
 (** [] *)
 
 (** The following lemma about [leb] might help you in the next
@@ -1087,7 +1162,26 @@ Proof.
 Theorem remove_does_not_increase_count: forall (s : bag),
   (count 0 (remove_one 0 s)) <=? (count 0 s) = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+    intros s.
+    induction s as [| n s' H].
+    {
+        simpl.
+        reflexivity.
+    }
+    {
+        destruct n as [| n'].
+        {
+            simpl.
+            rewrite -> leb_n_Sn.
+            reflexivity.   
+        }
+        {
+            simpl.
+            rewrite -> H.
+            reflexivity.   
+        }
+    }
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, optional (bag_count_sum)
@@ -1111,7 +1205,13 @@ Proof.
 Theorem rev_injective : forall (l1 l2 : natlist),
   rev l1 = rev l2 -> l1 = l2.
 Proof.
-  (* FILL IN HERE *) Admitted.
+    intros l1 l2.
+    intros H.
+    rewrite <- rev_involutive.
+    rewrite <- H.
+    rewrite -> rev_involutive.
+    reflexivity.
+Qed.
 (** [] *)
 
 (* ################################################################# *)
