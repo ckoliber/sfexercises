@@ -963,17 +963,54 @@ Search (?x + ?y = ?y + ?x).
 Theorem app_nil_r : forall l : natlist,
   l ++ [] = l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+    intros l.
+    induction l as [| h t H].
+    {
+        simpl.
+        reflexivity.
+    }
+    {
+        simpl.
+        rewrite -> H.
+        reflexivity.    
+    }
+Qed.
 
 Theorem rev_app_distr: forall l1 l2 : natlist,
   rev (l1 ++ l2) = rev l2 ++ rev l1.
 Proof.
-  (* FILL IN HERE *) Admitted.
+    intros l1 l2.
+    induction l1 as [| h t H].
+    {
+        simpl.
+        rewrite -> app_nil_r.
+        reflexivity.
+    }
+    {
+        simpl.
+        rewrite -> H.
+        rewrite -> app_assoc.
+        reflexivity.
+    }
+Qed.
 
 Theorem rev_involutive : forall l : natlist,
   rev (rev l) = l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+    intros l.
+    induction l as [| h t H].
+    {
+        simpl.
+        reflexivity.
+    }
+    {
+        simpl.
+        rewrite -> rev_app_distr.
+        rewrite -> H.
+        simpl.
+        reflexivity.
+    }
+Qed.
 
 (** There is a short solution to the next one.  If you find yourself
     getting tangled up, step back and try to look for a simpler
