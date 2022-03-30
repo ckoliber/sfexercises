@@ -1359,7 +1359,12 @@ Definition eqb_id (x1 x2 : id) :=
 (** **** Exercise: 1 star, standard (eqb_id_refl) *)
 Theorem eqb_id_refl : forall x, eqb_id x x = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+    intros x.
+    destruct x as [n].
+    simpl.
+    rewrite -> eqb_refl.
+    reflexivity.
+Qed.
 (** [] *)
 
 (** Now we define the type of partial maps: *)
@@ -1405,15 +1410,24 @@ Theorem update_eq :
   forall (d : partial_map) (x : id) (v: nat),
     find x (update d x v) = Some v.
 Proof.
- (* FILL IN HERE *) Admitted.
-(** [] *)
+    intros d x v.
+    simpl.
+    rewrite -> eqb_id_refl.
+    reflexivity.
+Qed.
+(** [] *) 
 
 (** **** Exercise: 1 star, standard (update_neq) *)
 Theorem update_neq :
   forall (d : partial_map) (x y : id) (o: nat),
     eqb_id x y = false -> find x (update d y o) = find x d.
 Proof.
- (* FILL IN HERE *) Admitted.
+    intros d x y o.
+    intros H.
+    simpl.
+    rewrite -> H.
+    reflexivity.
+Qed.
 (** [] *)
 End PartialMap.
 
